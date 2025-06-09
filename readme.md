@@ -5,6 +5,13 @@
 
 ---
 
+## 项目部署
+下载项目后执行如下命令：
+```shell
+go build
+./GolandWeb
+```
+
 演示：
 
 ![](img/index.png)
