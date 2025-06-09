@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Goland Web 安全实验室</title>
+    <style>
+        /* 磨砂玻璃效果导航栏 */
+        #toc-sidebar {
+            position: fixed;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 220px;
+            background: rgba(40, 44, 52, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            max-height: 80vh;
+            overflow-y: auto;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(97, 218, 251, 0.2);
+        }
+
+        #toc-sidebar.collapsed {
+            transform: translateX(-90%) translateY(-50%);
+            background: rgba(30, 34, 42, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(97, 218, 251, 0.3);
+            opacity: 0.7;
+        }
+
+        #toc-sidebar.collapsed:hover {
+            transform: translateX(0) translateY(-50%);
+            opacity: 1;
+            box-shadow: 0 0 15px rgba(97, 218, 251, 0.3);
+        }
+
+        #toc-title {
+            color: #61dafb;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(97, 218, 251, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            color: #61dafb;
+            background: rgba(97, 218, 251, 0.1);
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(97, 218, 251, 0.2);
+        }
+
+        .toc-category {
+            padding: 8px 0;
+            margin: 8px 0;
+            cursor: pointer;
+            font-weight: bold;
+            color: #61dafb;
+            border-bottom: 1px solid rgba(97, 218, 251, 0.2);
+            display: flex;
+            align-items: center;
+        }
+
+        .toc-category::before {
+            content: "▶";
+            font-size: 0.8em;
+            margin-right: 8px;
+            transition: transform 0.3s;
+        }
+
+        .toc-category.expanded::before {
+            transform: rotate(90deg);
+        }
+
+        .toc-items {
+            padding-left: 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .toc-category.expanded + .toc-items {
+            max-height: 1000px;
+        }
+
+        .toc-item {
+            padding: 8px 12px;
+            margin: 6px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #e0e0e0;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 2px solid transparent;
+        }
+
+        .toc-item:hover {
+            background: rgba(97, 218, 251, 0.15);
+            transform: translateX(5px);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            #toc-sidebar {
+                width: 180px;
+                font-size: 14px;
+            }
+
+            #toc-sidebar.collapsed {
+                transform: translateX(-85%) translateY(-50%);
+            }
+        }
+
+        /* 主体样式 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e4e8;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        .vulnerability-category {
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .vulnerability-category h2 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.6em;
+            display: flex;
+            align-items: center;
+        }
+
+        .vulnerability-category h2::before {
+            content: "●";
+            color: #3498db;
+            margin-right: 10px;
+            font-size: 0.8em;
+        }
+
+        .vulnerability {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3498db;
+        }
+
+        .vulnerability-link {
+            font-weight: bold;
+            text-decoration: none;
+            color: #2980b9;
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .payload-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            margin-top: 8px;
+            font-size: 0.95em;
+        }
+
+        .xss {
+            border-left-color: #e74c3c;
+        }
+
+        .sqli {
+            border-left-color: #f39c12;
+        }
+
+        .nil {
+            border-left-color: #9b59b6;
+        }
+
+        .command {
+            border-left-color: #1abc9c;
+        }
+
+        .no-xss {
+            border-left-color: #2ecc71;
+        }
+
+        .dirtrav {
+            border-left-color: #d19f1f; /* 紫色标识 */
+        }
+
+        /* 底部信息样式 */
+        .site-footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px 0;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-top: 1px solid #34495e;
+            margin-top: 40px;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            box-sizing: border-box;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section {
+            text-align: left;
+            min-width: 200px;
+        }
+
+        .footer-section h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 1px solid #34495e;
+            padding-bottom: 5px;
+        }
+
+        .footer-section p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .github-link {
+            color: #1abc9c;
+            text-decoration: none;
+            transition: color 0.3s;
+            word-break: break-all;
+        }
+
+        .github-link:hover {
+            color: #16a085;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            font-size: 0.9em;
+            color: #bdc3c7;
+            margin-top: 20px;
+            border-top: 1px solid #34495e;
+            padding-top: 15px;
+        }
+
+        /* 防止出现水平滚动条 */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .footer-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .footer-section {
+                text-align: center;
+                width: 100%;
+            }
+
+            .site-footer {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Goland Web 安全研究项目</h1>
+    <p>Hello Every One, It's Goland-Web-Vulnerability-App, Welcome here.</p>
+</header>
+
+<!-- 磨砂玻璃效果导航栏 -->
+<div id="toc-sidebar" class="collapsed">
+    <div id="toc-title">
+        <span>漏洞分类导航</span>
+        <span class="toggle-btn">≡</span>
+    </div>
+    <!-- 目录项将由JS动态生成 -->
+</div>
+
+<!-- 跨站脚本攻击分类 -->
+<section class="vulnerability-category" id="category-xss">
+    <h2>跨站脚本攻击 (XSS)</h2>
+
+    <div class="vulnerability xss" id="vul-1">
+        <a href="/XSS/reflectXSS1?name=<script>alert(1)</script>" class="vulnerability-link">Reflect XSS1</a>
+        <div class="payload-box">&#x2f;&#x58;&#x53;&#x53;&#x2f;&#x72;&#x65;&#x66;&#x6c;&#x65;&#x63;&#x74;&#x58;&#x53;&#x53;&#x31;&#x3f;&#x6e;&#x61;&#x6d;&#x65;&#x3d;&#x3c;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x61;&#x6c;&#x65;&#x72;&#x74;&#x28;&#x31;&#x29;&#x3c;&#x2f;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;</div>
+    </div>
+
+    <div class="vulnerability xss" id="vul-2">
+        <a href="/XSS/reflectXSS2?name=<script>alert(1)</script>" class="vulnerability-link">Reflect XSS2</a>
+        <div class="payload-box">&#x2f;&#x58;&#x53;&#x53;&#x2f;&#x72;&#x65;&#x66;&#x6c;&#x65;&#x63;&#x74;&#x58;&#x53;&#x53;&#x32;&#x3f;&#x6e;&#x61;&#x6d;&#x65;&#x3d;&#x3c;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x61;&#x6c;&#x65;&#x72;&#x74;&#x28;&#x31;&#x29}&#x3c;&#x2f;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;</div>
+    </div>
+
+    <div class="vulnerability xss" id="vul-3">
+        <a href="/XSS/reflectXSS3?name=<script>alert(1)</script>" class="vulnerability-link">Reflect XSS3</a>
+        <div class="payload-box">&#x58;&#x53;&#x53;&#x2f;&#x72;&#x65;&#x66;&#x6c;&#x65;&#x63;&#x74;&#x58;&#x53;&#x53;&#x33;&#x3f;&#x6e;&#x61;&#x6d;&#x65;&#x3d;&#x3c;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x61;&#x6c;&#x65;&#x72;&#x74;&#x28;&#x31;&#x29}&#x3c;&#x2f;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x22;</div>
+    </div>
+
+    <div class="vulnerability xss" id="vul-4">
+        <a href="/XSS/reflectXSS4?name=<script>alert(1)</script>" class="vulnerability-link">Reflect XSS4</a>
+        <div class="payload-box">&#x2f;&#x58;&#x53;&#x53;&#x2f;&#x72;&#x65;&#x66;&#x6c;&#x65;&#x63;&#x74;&#x58;&#x53;&#x53;&#x34;&#x3f;&#x6e;&#x61;&#x6d;&#x65;&#x3d;&#x3c;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x61;&#x6c;&#x65;&#x72;&#x74;&#x28;&#x31;&#x29}&#x3c;&#x2f;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;</div>
+    </div>
+
+    <div class="vulnerability no-xss" id="vul-5">
+        <a href="/XSS/NoXSS1?name=<script>alert(1)</script>" class="vulnerability-link">No XSS1</a>
+        <div class="payload-box">&#x2f;&#x58;&#x53;&#x53;&#x2f;&#x4e;&#x6f;&#x58;&#x53;&#x53;&#x31;&#x3f;&#x6e;&#x61;&#x6d;&#x65;&#x3d;&#x3c;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x61;&#x6c;&#x65;&#x72;&#x74;&#x28;&#x31;&#x29}&#x3c;&#x2f;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;</div>
+    </div>
+</section>
+
+<!-- SQL注入分类 -->
+<section class="vulnerability-category" id="category-sqli">
+    <h2>SQL注入 (SQL Injection)</h2>
+
+    <div class="vulnerability sqli" id="vul-6">
+        <a href="/SQLi/SQLi1?id=100'+or+sleep(1)--+-" class="vulnerability-link">SQLi 1</a>
+        <div class="payload-box">/SQLi/SQLi1?id=100'+or+sleep(1)--+-</div>
+    </div>
+</section>
+
+<!-- 空指针异常分类 -->
+<section class="vulnerability-category" id="category-nil">
+    <h2>空指针异常 (Nil Error)</h2>
+
+    <div class="vulnerability nil" id="vul-7">
+        <a href="/NilError/NilError1?id=0" class="vulnerability-link">Nil Error 1</a>
+        <div class="payload-box">/NilError/NilError1?id=0</div>
+    </div>
+
+    <div class="vulnerability nil" id="vul-8">
+        <a href="/NilError/NilError2?content=0" class="vulnerability-link">Nil Error 2</a>
+        <div class="payload-box">/NilError/NilError2?content=0</div>
+    </div>
+</section>
+
+<!-- 命令注入分类 -->
+<section class="vulnerability-category" id="category-command">
+    <h2>命令注入 (Command Injection)</h2>
+
+    <div class="vulnerability command" id="vul-9">
+        <a href="/CommandInjection/cmdi1?url=%68%74%74%70%3a%2f%2f%77%77%77%2e%62%61%69%64%75%2e%63%6f%6d%20%3b%20%63%61%74%20%2f%65%74%63%2f%70%61%73%73%77%64"
+           class="vulnerability-link">Command Injection 1</a>
+        <div class="payload-box">/CommandInjection/cmdi1?url=http://www.baidu.com ; cat /etc/passwd</div>
+    </div>
+</section>
+
+<!-- 路径穿越 -->
+<section class="vulnerability-category" id="category-upload">
+    <h2>路径穿越 (File Upload)</h2>
+
+    <div class="vulnerability dirtrav" id="vul-10">
+        <a href="/DirTraversal/FileRead?path=/etc/passwd" class="vulnerability-link">任意文件读取</a>
+        <div class="payload-box">/DirTraversal/FileRead?path=/etc/passwd</div>
+    </div>
+    <div class="vulnerability dirtrav" id="vul-11">
+        <a href="/DirTraversal/FileWrite?path=1.txt&content=success" class="vulnerability-link">任意写文件</a>
+        <div class="payload-box">/DirTraversal/FileWrite?path=1.txt&content=success</div>
+    </div>
+    <div class="vulnerability dirtrav" id="vul-12">
+        <a href="/DirTraversal/FileDelete" class="vulnerability-link">任意文件删除</a>
+        <div class="payload-box">/DirTraversal/FileDelete?path=../../../xxxx.txt</div>
+    </div>
+    <div class="vulnerability dirtrav" id="vul-13">
+        <a href="/DirTraversal/FileUpload" class="vulnerability-link">任意文件上传</a>
+        <div class="payload-box">无</div>
+    </div>
+
+</section>
+
+<!-- 底部项目信息展示 -->
+<footer class="site-footer">
+    <div class="footer-content">
+        <div class="footer-info">
+            <div class="footer-section">
+                <h3>项目信息</h3>
+                <p><strong>名称：</strong>Goland Web 安全实验室</p>
+                <p><strong>版本：</strong>1.0.0</p>
+                <p><strong>最后更新：</strong>2025-06-06</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>开发者信息</h3>
+                <p><strong>作者：</strong>莱昂纳多</p>
+                <p><strong>邮箱：</strong>623712611@qq.com</p>
+                <p><strong>Github：</strong>https://github.com/bigblackhat</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>代码仓库</h3>
+                <p><strong>GitHub：</strong></p>
+                <p>
+                    <a href="https://github.com/bigblackhat/GoVulnWebApp"
+                       class="github-link"
+                       target="_blank">
+                        https://github.com/bigblackhat/GoVulnWebApp
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>版权所有 &copy; 2023-2025 bigblackhat | 保留所有权利</p>
+            <p>本网站仅供学习研究使用，请遵守相关法律法规</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // 分类结构
+    const categories = [
+        {
+            id: 'category-xss',
+            title: '跨站脚本攻击 (XSS)',
+            vulnerabilities: ['vul-1', 'vul-2', 'vul-3', 'vul-4', 'vul-5']
+        },
+        {
+            id: 'category-sqli',
+            title: 'SQL注入 (SQL Injection)',
+            vulnerabilities: ['vul-6']
+        },
+        {
+            id: 'category-nil',
+            title: '空指针异常 (Nil Error)',
+            vulnerabilities: ['vul-7', 'vul-8']
+        },
+        {
+            id: 'category-command',
+            title: '命令注入 (Command Injection)',
+            vulnerabilities: ['vul-9']
+        },
+        {
+            id: 'category-dirtrav',
+            title: '路径穿越（Dir Traversal）',
+            vulnerabilities: ['vul-10', "vul-11", 'vul-12', 'vul-13']
+        }
+    ];
+
+    // 自动生成目录（动态场景）
+    function generateToc() {
+        const tocContainer = document.getElementById('toc-sidebar');
+
+        // 清除现有目录项（保留标题和按钮）
+        while (tocContainer.children.length > 1) {
+            tocContainer.removeChild(tocContainer.lastChild);
+        }
+
+        // 生成分类导航
+        categories.forEach(category => {
+            // 创建分类标题
+            const categoryTitle = document.createElement('div');
+            categoryTitle.className = 'toc-category';
+            categoryTitle.textContent = category.title;
+            categoryTitle.dataset.target = category.id;
+
+            // 创建子菜单容器
+            const subItemsContainer = document.createElement('div');
+            subItemsContainer.className = 'toc-items';
+
+            // 生成子菜单项
+            category.vulnerabilities.forEach(vulId => {
+                const vulElement = document.getElementById(vulId);
+                if (vulElement) {
+                    const title = vulElement.querySelector('.vulnerability-link').textContent;
+                    const tocItem = document.createElement('div');
+                    tocItem.className = 'toc-item';
+                    tocItem.dataset.target = vulId;
+                    tocItem.textContent = title;
+                    subItemsContainer.appendChild(tocItem);
+                }
+            });
+
+            // 添加到导航栏
+            tocContainer.appendChild(categoryTitle);
+            tocContainer.appendChild(subItemsContainer);
+        });
+    }
+
+    // 点击滚动定位
+    function setupTocNavigation() {
+        // 漏洞项点击事件
+        document.querySelectorAll('.toc-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const target = document.getElementById(item.dataset.target);
+                if (target) {
+                    target.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            });
+        });
+
+        // 分类标题点击事件
+        document.querySelectorAll('.toc-category').forEach(category => {
+            category.addEventListener('click', function () {
+                this.classList.toggle('expanded');
+
+                // 点击分类标题时也滚动到该分类
+                const target = document.getElementById(this.dataset.target);
+                if (target) {
+                    target.scrollIntoView({behavior: 'smooth', block: 'start'});
+                }
+            });
+        });
+    }
+
+    // 导航栏收起/展开功能
+    function setupTocToggle() {
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const tocSidebar = document.getElementById('toc-sidebar');
+
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止事件冒泡
+            tocSidebar.classList.toggle('collapsed');
+            // 更新按钮文本
+            toggleBtn.textContent = tocSidebar.classList.contains('collapsed') ? '≡' : '×';
+        });
+
+        // 点击导航栏外部时收起
+        document.addEventListener('click', (e) => {
+            if (!tocSidebar.contains(e.target) && !tocSidebar.classList.contains('collapsed')) {
+                tocSidebar.classList.add('collapsed');
+                toggleBtn.textContent = '≡';
+            }
+        });
+    }
+
+    // 初始化所有功能
+    window.addEventListener('DOMContentLoaded', () => {
+        generateToc();
+        setupTocNavigation();
+        setupTocToggle();
+
+        // 默认展开所有分类
+        document.querySelectorAll('.toc-category').forEach(category => {
+            category.classList.add('expanded');
+        });
+    });
+</script>
+</body>
+</html>
