@@ -1,6 +1,11 @@
 # Golang Web靶场
 
-基于Golang的Web安全靶场
+
+![GoVulnWebApp](https://socialify.git.ci/bigblackhat/GoVulnWebApp/image?description=1&font=KoHo&forks=1&issues=1&owner=1&pattern=Signal&pulls=1&stargazers=1&theme=Auto)
+
+---
+
+演示：
 
 ![](img/index.png)
 
