@@ -42,3 +42,8 @@ go build
 * 增加index.html界面
 ### v1.0
 * 基础漏洞类型：XSS、SQL注入、空指针异常、命令注入
+
+
+## Thanks
+
+感谢 @[大白哥](https://github.com/1derian) 提供的诸多信息资料参考
