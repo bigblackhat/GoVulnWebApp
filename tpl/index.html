@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Goland Web 安全实验室</title>
+    <title>Golang Web 安全实验室</title>
     <style>
         :root {
             /* 主色调 - 充满活力的蓝紫色调 */
@@ -29,6 +29,8 @@
             --nil-color: #9c88ff;
             --command-color: #1dd1a1;
             --dirtrav-color: #feca57;
+            --ssrf-color: #7bfe57;
+            --ssti-color: #57fef0;
         }
 
         body {
@@ -269,6 +271,7 @@
         .xss {
             border-left-color: var(--xss-color);
         }
+
         .xss .vulnerability-link {
             color: var(--xss-color);
         }
@@ -276,6 +279,7 @@
         .sqli {
             border-left-color: var(--sqli-color);
         }
+
         .sqli .vulnerability-link {
             color: var(--sqli-color);
         }
@@ -283,6 +287,7 @@
         .nil {
             border-left-color: var(--nil-color);
         }
+
         .nil .vulnerability-link {
             color: var(--nil-color);
         }
@@ -290,6 +295,7 @@
         .command {
             border-left-color: var(--command-color);
         }
+
         .command .vulnerability-link {
             color: var(--command-color);
         }
@@ -297,6 +303,7 @@
         .dirtrav {
             border-left-color: var(--dirtrav-color);
         }
+
         .dirtrav .vulnerability-link {
             color: var(--dirtrav-color);
         }
@@ -304,8 +311,25 @@
         .no-xss {
             border-left-color: var(--command-color);
         }
+
         .no-xss .vulnerability-link {
             color: var(--command-color);
+        }
+
+        .ssrf {
+            border-left-color: var(--ssrf-color);
+        }
+
+        .ssrf .vulnerability-link {
+            color: var(--ssrf-color);
+        }
+
+        .ssti {
+            border-left-color: var(--ssti-color);
+        }
+
+        .ssti .vulnerability-link {
+            color: var(--ssti-color);
         }
 
         /* 底部信息样式 */
@@ -410,29 +434,57 @@
 
         /* 动画效果 */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .vulnerability-category, .vulnerability {
             animation: fadeIn 0.6s ease-out forwards;
         }
 
-        .vulnerability-category:nth-child(2) { animation-delay: 0.1s; }
-        .vulnerability-category:nth-child(3) { animation-delay: 0.2s; }
-        .vulnerability-category:nth-child(4) { animation-delay: 0.3s; }
-        .vulnerability-category:nth-child(5) { animation-delay: 0.4s; }
+        .vulnerability-category:nth-child(2) {
+            animation-delay: 0.1s;
+        }
 
-        .vulnerability:nth-child(2) { animation-delay: 0.15s; }
-        .vulnerability:nth-child(3) { animation-delay: 0.3s; }
-        .vulnerability:nth-child(4) { animation-delay: 0.45s; }
-        .vulnerability:nth-child(5) { animation-delay: 0.6s; }
+        .vulnerability-category:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .vulnerability-category:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .vulnerability-category:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        .vulnerability:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .vulnerability:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .vulnerability:nth-child(4) {
+            animation-delay: 0.45s;
+        }
+
+        .vulnerability:nth-child(5) {
+            animation-delay: 0.6s;
+        }
     </style>
 </head>
 <body>
 <header>
-    <h1>Goland Web 安全研究项目</h1>
-    <p>Hello Every One, It's Goland-Web-Vulnerability-App, Welcome here.</p>
+    <h1>Golang Web 安全实验室</h1>
+    <p>Hello Every One, It's Golang-Web-Vulnerability-App, Welcome here.</p>
 </header>
 
 <!-- 磨砂玻璃效果导航栏 -->
@@ -530,19 +582,46 @@
         <a href="/DirTraversal/FileUpload" class="vulnerability-link">任意文件上传</a>
         <div class="payload-box">无</div>
     </div>
+</section>
 
+<!-- 服务端请求伪造 -->
+<section class="vulnerability-category" id="category-ssrf">
+    <h2>服务端请求伪造 (SSRF)</h2>
+
+    <div class="vulnerability ssrf" id="vul-14">
+        <a href="/SSRF/SSRF1?url=https://www.baidu.com" class="vulnerability-link">SSRF 1</a>
+        <div class="payload-box">/SSRF/SSRF1?url=https://www.baidu.com</div>
+    </div>
+    <div class="vulnerability ssrf" id="vul-17">
+        <a href="/SSRF/NoSSRF?path=go/go-program-structure.html" class="vulnerability-link">No SSRF</a>
+        <div class="payload-box">/SSRF/NoSSRF?path=go/go-program-structure.html</div>
+    </div>
+</section>
+
+<!-- 服务端模板注入 -->
+<section class="vulnerability-category" id="category-ssti">
+    <h2>服务端模板注入 (SSTI)</h2>
+
+    <div class="vulnerability ssti" id="vul-15">
+        <a href="/SSTI/SSTI1" class="vulnerability-link">SSTI 1</a>
+        <div class="payload-box">/SSRF/SSRF1?url=https://www.baidu.com</div>
+    </div>
+    <div class="vulnerability ssti" id="vul-16">
+        <a href="/SSTI/SSTI2" class="vulnerability-link">SSTI 2</a>
+        <div class="payload-box">/SSRF/SSRF1?url=https://www.baidu.com</div>
+    </div>
 </section>
 
 <!-- 底部项目信息展示 -->
 <footer class="site-footer">
     <div class="footer-content">
         <div class="footer-info">
-            <div class="footer-section">
-                <h3>项目信息</h3>
-                <p><strong>名称：</strong>Goland Web 安全实验室</p>
-                <p><strong>版本：</strong>1.0.0</p>
-                <p><strong>最后更新：</strong>2025-06-06</p>
-            </div>
+            <!--            <div class="footer-section">-->
+            <!--                <h3>项目信息</h3>-->
+            <!--                <p><strong>名称：</strong>Golang Web 安全实验室</p>-->
+            <!--                <p><strong>版本：</strong>1.0.0</p>-->
+            <!--                <p><strong>最后更新：</strong>2025-06-06</p>-->
+            <!--            </div>-->
 
             <div class="footer-section">
                 <h3>开发者信息</h3>
@@ -565,7 +644,7 @@
         </div>
 
         <div class="copyright">
-            <p>版权所有 &copy; 2023-2025 bigblackhat | 保留所有权利</p>
+            <p>版权所有 &copy; 2025-3025 莱昂纳多 | 保留所有权利</p>
             <p>本网站仅供学习研究使用，请遵守相关法律法规</p>
         </div>
     </div>
@@ -598,6 +677,16 @@
             id: 'category-upload',
             title: '路径穿越（Dir Traversal）',
             vulnerabilities: ['vul-10', "vul-11", 'vul-12', 'vul-13']
+        },
+        {
+            id: 'ssrf',
+            title: '服务端请求伪造（SSRF）',
+            vulnerabilities: ['vul-14', 'vul-17']
+        },
+        {
+            id: 'ssti',
+            title: "服务端模板注入（SSTI）",
+            vulnerabilities: ['vul-15', 'vul-16']
         }
     ];
 

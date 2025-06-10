@@ -70,6 +70,14 @@ func WebServerRun() {
 	http.HandleFunc("/DirTraversal/FileDelete", pkg.FileDelete)
 	http.HandleFunc("/DirTraversal/FileUpload", pkg.FileUpload)
 
+	// SSRF
+	http.HandleFunc("/SSRF/SSRF1", pkg.SSRF1)
+	http.HandleFunc("/SSRF/NoSSRF", pkg.NoSSRF)
+
+	// SSTI
+	http.HandleFunc("/SSTI/SSTI1", pkg.SSTI1)
+	http.HandleFunc("/SSTI/SSTI2", pkg.SSTI2)
+
 	// 启动HTTP服务器，监听8080端口
 	http.ListenAndServe(":8080", nil)
 }
