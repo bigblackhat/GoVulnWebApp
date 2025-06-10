@@ -46,4 +46,4 @@ go build
 
 ## Thanks
 
-感谢 @[大白哥](https://github.com/1derian) 提供的诸多信息资料参考
+感谢 @[大白哥](https://github.com/1derian) 提供的诸多帮助
