@@ -46,4 +46,4 @@ go build
 
 ## Thanks
 
-感谢 @[大白哥](https://github.com/1derian) 提供的诸多帮助
+感谢 @[大白哥](https://github.com/1derian) 提供的诸多idea，在他的帮助下，该项目得以丰富更多的漏洞类型
