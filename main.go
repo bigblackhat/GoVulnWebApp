@@ -3,10 +3,14 @@ package main
 import (
 	"GolandWeb/pkg"
 	"database/sql"
+	"flag"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"html/template"
+	"net"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -34,9 +38,51 @@ func mysqlTestHandler(w http.ResponseWriter, r *http.Request) {
 		"DB Config is: " + db_config + "<br>"))
 }
 
-func WebServerRun() {
-	fmt.Println("Go-Web, Listening on port 8080")
-	fmt.Println("       _==/          i     i          \\==_\n     /XX/            |\\___/|            \\XX\\\n   /XXXX\\            |XXXXX|            /XXXX\\\n  |XXXXXX\\_         _XXXXXXX_         _/XXXXXX|\n XXXXXXXXXXXxxxxxxxXXXXXXXXXXXxxxxxxxXXXXXXXXXXX\n|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|\n XXXXXX/^^^^\"\\XXXXXXXXXXXXXXXXXXXXX/^^^^^\\XXXXXX\n  |XXX|       \\XXX/^^\\XXXXX/^^\\XXX/       |XXX|\n    \\XX\\       \\X/    \\XXX/    \\X/       /XX/\n       \"\\       \"      \\X/      \"      /\"\n\n------------------------------------------------\n")
+var banner = `
+       _==/          i     i          \==_
+     /XX/            |\___/|            \XX\
+   /XXXX\            |XXXXX|            /XXXX\
+  |XXXXXX\_         _XXXXXXX_         _/XXXXXX|
+ XXXXXXXXXXXxxxxxxxXXXXXXXXXXXxxxxxxxXXXXXXXXXXX
+|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|
+ XXXXXX/^^^^"\XXXXXXXXXXXXXXXXXXXXX/^^^^^\XXXXXX
+  |XXX|       \XXX/^^\XXXXX/^^\XXX/       |XXX|
+    \XX\       \X/    \XXX/    \X/       /XX/
+       "\       "      \X/      "      /"
+------------------------------------------------
+`
+
+// 检查端口是否被占用
+func isPortOccupied(port int) bool {
+	addr := ":" + strconv.Itoa(port)
+	listener, err := net.Listen("tcp", addr)
+
+	if err != nil {
+		// 检查特定错误类型
+		if opErr, ok := err.(*net.OpError); ok {
+			if opErr.Op == "listen" {
+				return true
+			}
+		}
+		return false
+	}
+
+	// 端口可用，立即关闭
+	listener.Close()
+	return false
+}
+
+func WebServerRun(port int) {
+	// 检查端口是否可用
+	if isPortOccupied(port) {
+		fmt.Printf("Error: Port %d is already in use. Please choose a different port.\n", port)
+		os.Exit(1)
+	}
+
+	fmt.Println("Go-Web, Listening on port:", port)
+	fmt.Println(banner)
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/home", homeHandler)
@@ -78,10 +124,29 @@ func WebServerRun() {
 	http.HandleFunc("/SSTI/SSTI1", pkg.SSTI1)
 	http.HandleFunc("/SSTI/SSTI2", pkg.SSTI2)
 
+	// 创建自定义HTTP服务器实例，直接使用已检测过的listener
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		fmt.Printf("Unexpected error after port check: %v\n", err)
+		os.Exit(1)
+	}
+	// 启动服务器
+	fmt.Println("Server is running...")
+	fmt.Printf("Visit: http://localhost:%d\n", port)
+
+	if err := http.Serve(listener, nil); err != nil {
+		fmt.Printf("Server failed to start: %v\n", err)
+		os.Exit(1)
+	}
 	// 启动HTTP服务器，监听8080端口
-	http.ListenAndServe(":8080", nil)
+	//http.ListenAndServe(":8080", nil)
 }
 
 func main() {
-	WebServerRun()
+	// 1. 解析命令行端口参数
+	port := flag.Int("port", 8080, "HTTP server port")
+	flag.Parse()
+
+	// 2. 启动带端口检查的Web服务器
+	WebServerRun(*port)
 }
