@@ -13,7 +13,7 @@ cd GoVulnWebApp
 go build -o server
 ./server
 ```
-访问地址：http://127.0.0.1:8080，进入靶场。
+访问地址：http://127.0.0.1:8080 进入靶场。
 
 也可以指定启动端口：`./server -port=8081`。
 
