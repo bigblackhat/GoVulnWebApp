@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全实验室登录</title>
+    <style>
+        :root {
+            /* 主色调 - 小清新蓝绿色系 */
+            --primary-color: #6ecbf5;
+            --primary-light: #a2d9f9;
+            --primary-dark: #4ba3d1;
+
+            /* 辅助色 */
+            --accent-color: #ffb88c;
+            --accent-light: #ffd0b3;
+
+            /* 背景渐变 */
+            --bg-gradient-start: #f0f7ff;
+            --bg-gradient-end: #e3f2fd;
+
+            /* 文字色 */
+            --text-primary: #333;
+            --text-secondary: #666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(110, 203, 245, 0.15);
+            border: 1px solid rgba(163, 217, 249, 0.3);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: var(--primary-dark);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary-light), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid rgba(163, 217, 249, 0.4);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(110, 203, 245, 0.2);
+        }
+
+        .input-group input::placeholder {
+            color: #aaa;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(110, 203, 245, 0.3);
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(110, 203, 245, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+
+        .register-link {
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 20px;
+        }
+
+        .register-link a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .register-link a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 25px 20px;
+            }
+
+            .login-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .input-group input {
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-header">
+        <h1>Go 安全实验室</h1>
+        <p>请输入您的凭证以访问漏洞靶场</p>
+    </div>
+
+    <form id="loginForm" action="/login" method="post">
+        <div class="input-group">
+            <label for="username">用户名</label>
+            <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="请输入用户名或邮箱"
+                    required
+                    autocomplete="off"
+            >
+        </div>
+
+        <div class="input-group">
+            <label for="password">密码</label>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="请输入密码"
+                    required
+                    autocomplete="off"
+            >
+        </div>
+
+        <button type="submit" class="login-btn">登 录</button>
+    </form>
+
+    <div class="register-link">
+        没有账户? <a href="#">立即注册</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // 创建表单数据对象
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        // 发送登录请求
+        fetch('/login', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 登录成功，跳转到首页
+                    window.location.href = '/index';
+                } else {
+                    // 登录失败处理
+                    alert('登录失败，请检查用户名和密码');
+                }
+            })
+            .catch(error => {
+                console.error('登录请求错误:', error);
+                alert('登录请求失败，请稍后重试');
+            });
+    });
+</script>
+</body>
+</html>

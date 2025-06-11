@@ -5,32 +5,33 @@
     <title>Golang Web 安全实验室</title>
     <style>
         :root {
-            /* 主色调 - 充满活力的蓝紫色调 */
-            --primary-color: #6a11cb;
-            --primary-light: #8e44ad;
-            --primary-dark: #4a0bc2;
+            /* 小清新风格主色调 */
+            --primary-color: #6ecbf5;
+            --primary-light: #a2d9f9;
+            --primary-dark: #4ba3d1;
 
-            /* 辅助色 - 互补的橙色系 */
-            --accent-color: #ff6b6b;
-            --accent-light: #ff9e6d;
-            --accent-dark: #ff4757;
+            /* 辅助色 - 柔和色调 */
+            --accent-color: #ffb88c;
+            --accent-light: #ffd0b3;
+            --accent-dark: #ff9e6d;
 
-            /* 背景色 - 深色渐变 */
-            --bg-gradient-start: #1e1e2f;
-            --bg-gradient-end: #2d2b55;
+            /* 背景色 - 浅色渐变 */
+            --bg-gradient-start: #f0f7ff;
+            --bg-gradient-end: #e3f2fd;
 
             /* 文字色 */
-            --text-primary: #f8f9fa;
-            --text-secondary: #adb5bd;
+            --text-primary: #333;
+            --text-secondary: #666;
 
-            /* 分类色 */
-            --xss-color: #ff6b6b;
-            --sqli-color: #ff9e6d;
-            --nil-color: #9c88ff;
-            --command-color: #1dd1a1;
-            --dirtrav-color: #feca57;
-            --ssrf-color: #7bfe57;
-            --ssti-color: #57fef0;
+            /* 分类色 - 柔和的色调 */
+            --xss-color: #ff9a9e;
+            --sqli-color: #ffb88c;
+            --npe-color: #b19cd9;
+            --command-color: #a2d9a0;
+            --dirtrav-color: #ffd966;
+            --ssrf-color: #6ecbf5;
+            --ssti-color: #81d4d4;
+            --redirect-color: #d7b4a1;
         }
 
         body {
@@ -49,15 +50,13 @@
             margin-bottom: 30px;
             padding-bottom: 15px;
             border-bottom: 2px solid var(--primary-light);
+            position: relative;
         }
 
         h1 {
-            color: var(--text-primary);
+            color: var(--primary-dark);
             font-size: 2.5rem;
-            background: linear-gradient(90deg, var(--primary-light), var(--accent-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
         }
 
         /* 磨砂玻璃效果导航栏 */
@@ -67,40 +66,40 @@
             top: 50%;
             transform: translateY(-50%);
             width: 220px;
-            background: rgba(30, 30, 46, 0.7);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 12px;
             padding: 15px;
-            box-shadow: 0 4px 20px rgba(106, 17, 203, 0.4);
+            box-shadow: 0 4px 20px rgba(110, 203, 245, 0.2);
             z-index: 1000;
             max-height: 80vh;
             overflow-y: auto;
             transition: all 0.5s ease;
-            border: 1px solid rgba(142, 68, 173, 0.5);
+            border: 1px solid rgba(163, 217, 249, 0.3);
         }
 
         #toc-sidebar.collapsed {
             transform: translateX(-90%) translateY(-50%);
-            background: rgba(30, 30, 46, 0.4);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(142, 68, 173, 0.6);
+            border: 1px solid rgba(163, 217, 249, 0.4);
             opacity: 0.7;
         }
 
         #toc-sidebar.collapsed:hover {
             transform: translateX(0) translateY(-50%);
             opacity: 1;
-            box-shadow: 0 0 20px rgba(106, 17, 203, 0.6);
+            box-shadow: 0 0 20px rgba(110, 203, 245, 0.3);
         }
 
         #toc-title {
-            color: var(--primary-light);
+            color: var(--primary-dark);
             font-weight: 600;
             margin-bottom: 12px;
             padding-bottom: 8px;
-            border-bottom: 1px solid rgba(142, 68, 173, 0.4);
+            border-bottom: 1px solid rgba(163, 217, 249, 0.4);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -111,14 +110,14 @@
             cursor: pointer;
             font-size: 1.2em;
             padding: 5px 10px;
-            color: var(--accent-light);
-            background: rgba(142, 68, 173, 0.2);
+            color: var(--accent-color);
+            background: rgba(255, 184, 140, 0.2);
             border-radius: 6px;
             transition: all 0.3s;
         }
 
         .toggle-btn:hover {
-            background: rgba(142, 68, 173, 0.3);
+            background: rgba(255, 184, 140, 0.3);
             transform: scale(1.05);
         }
 
@@ -127,17 +126,17 @@
             margin: 10px 0;
             cursor: pointer;
             font-weight: bold;
-            color: var(--primary-light);
-            border-bottom: 1px solid rgba(142, 68, 173, 0.3);
+            color: var(--primary-dark);
+            border-bottom: 1px solid rgba(163, 217, 249, 0.3);
             display: flex;
             align-items: center;
-            background: rgba(30, 30, 46, 0.4);
+            background: rgba(255, 255, 255, 0.7);
             border-radius: 8px;
             transition: all 0.3s;
         }
 
         .toc-category:hover {
-            background: rgba(142, 68, 173, 0.3);
+            background: rgba(163, 217, 249, 0.2);
             transform: translateX(5px);
         }
 
@@ -146,6 +145,7 @@
             font-size: 0.8em;
             margin-right: 10px;
             transition: transform 0.3s;
+            color: var(--primary-dark);
         }
 
         .toc-category.expanded::before {
@@ -170,15 +170,38 @@
             cursor: pointer;
             transition: all 0.3s;
             color: var(--text-secondary);
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.7);
             border-left: 2px solid transparent;
         }
 
         .toc-item:hover {
-            background: rgba(142, 68, 173, 0.2);
+            background: rgba(163, 217, 249, 0.2);
             transform: translateX(8px);
-            color: var(--text-primary);
-            border-left: 2px solid var(--accent-light);
+            color: var(--primary-dark);
+            border-left: 2px solid var(--accent-color);
+        }
+        /* 登出按钮样式 */
+        .logout-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            background: linear-gradient(to right, #ff9e6d, #ffb88c); /* 橙色渐变 */
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(255, 158, 109, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 158, 109, 0.4);
+            background: linear-gradient(to right, #ff8c5a, #ffa87b);
         }
 
         /* 响应式调整 */
@@ -191,26 +214,33 @@
             #toc-sidebar.collapsed {
                 transform: translateX(-85%) translateY(-50%);
             }
+
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 0.9em;
+                top: 5px;
+                right: 5px;
+            }
         }
 
         /* 主体样式 */
         .vulnerability-category {
             margin: 40px 0 25px;
             padding-bottom: 15px;
-            border-bottom: 2px solid;
+            border-bottom: 2px solid var(--primary-light);
             position: relative;
         }
 
         .vulnerability-category h2 {
-            color: var(--text-primary);
+            color: var(--primary-dark);
             margin: 0;
             font-size: 1.8em;
             display: flex;
             align-items: center;
             padding: 10px 15px;
             border-radius: 8px;
-            background: rgba(30, 30, 46, 0.4);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .vulnerability-category h2::before {
@@ -220,11 +250,11 @@
         }
 
         .vulnerability {
-            background: rgba(30, 30, 46, 0.5);
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
             border-left: 5px solid;
             transition: all 0.3s ease;
             backdrop-filter: blur(5px);
@@ -232,7 +262,7 @@
 
         .vulnerability:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .vulnerability-link {
@@ -246,11 +276,11 @@
         }
 
         .vulnerability-link:hover {
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+            color: var(--primary-dark);
         }
 
         .payload-box {
-            background: rgba(20, 20, 36, 0.7);
+            background: rgba(255, 255, 255, 0.9);
             color: var(--text-primary);
             padding: 15px;
             border-radius: 8px;
@@ -258,20 +288,19 @@
             white-space: pre-wrap;
             margin-top: 12px;
             font-size: 1em;
-            border: 1px solid rgba(142, 68, 173, 0.3);
+            border: 1px solid rgba(163, 217, 249, 0.3);
             transition: all 0.3s;
         }
 
         .payload-box:hover {
-            background: rgba(25, 25, 46, 0.8);
-            box-shadow: 0 0 12px rgba(106, 17, 203, 0.4);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 12px rgba(110, 203, 245, 0.2);
         }
 
         /* 分类特定颜色 */
         .xss {
             border-left-color: var(--xss-color);
         }
-
         .xss .vulnerability-link {
             color: var(--xss-color);
         }
@@ -279,23 +308,20 @@
         .sqli {
             border-left-color: var(--sqli-color);
         }
-
         .sqli .vulnerability-link {
             color: var(--sqli-color);
         }
 
-        .nil {
-            border-left-color: var(--nil-color);
+        .npe {
+            border-left-color: var(--npe-color);
         }
-
-        .nil .vulnerability-link {
-            color: var(--nil-color);
+        .npe .vulnerability-link {
+            color: var(--npe-color);
         }
 
         .command {
             border-left-color: var(--command-color);
         }
-
         .command .vulnerability-link {
             color: var(--command-color);
         }
@@ -303,7 +329,6 @@
         .dirtrav {
             border-left-color: var(--dirtrav-color);
         }
-
         .dirtrav .vulnerability-link {
             color: var(--dirtrav-color);
         }
@@ -311,7 +336,6 @@
         .no-xss {
             border-left-color: var(--command-color);
         }
-
         .no-xss .vulnerability-link {
             color: var(--command-color);
         }
@@ -319,7 +343,6 @@
         .ssrf {
             border-left-color: var(--ssrf-color);
         }
-
         .ssrf .vulnerability-link {
             color: var(--ssrf-color);
         }
@@ -327,26 +350,30 @@
         .ssti {
             border-left-color: var(--ssti-color);
         }
-
         .ssti .vulnerability-link {
             color: var(--ssti-color);
         }
 
-        /* 底部信息样式 */
+        .redirect {
+            border-left-color: var(--redirect-color);
+        }
+        .redirect .vulnerability-link {
+            color: var(--redirect-color);
+        }
+
+        /* 底部信息样式 - 简化版 */
         .site-footer {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            background: rgba(255, 255, 255, 0.9);
             color: var(--text-primary);
-            padding: 30px 0;
+            padding: 20px 0;
             text-align: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin-top: 50px;
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            transform: translateX(-50%);
+            width: 100%;
             box-sizing: border-box;
             border-top: 1px solid var(--primary-light);
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
         }
 
         .footer-content {
@@ -355,54 +382,37 @@
             padding: 0 20px;
         }
 
-        .footer-info {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 25px;
-        }
-
         .footer-section {
-            text-align: left;
-            min-width: 200px;
-            background: rgba(30, 30, 46, 0.4);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .footer-section h3 {
-            color: var(--accent-light);
-            margin-bottom: 15px;
-            font-size: 1.3em;
-            border-bottom: 1px solid var(--primary-light);
-            padding-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
 
         .footer-section p {
-            margin: 10px 0;
+            margin: 0;
             line-height: 1.6;
         }
 
         .github-link {
-            color: var(--accent-light);
+            color: var(--primary-dark);
             text-decoration: none;
             transition: all 0.3s;
             word-break: break-all;
+            font-weight: 500;
         }
 
         .github-link:hover {
-            color: var(--text-primary);
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+            color: var(--accent-color);
+            text-decoration: underline;
         }
 
         .copyright {
-            font-size: 0.95em;
+            font-size: 0.85em;
             color: var(--text-secondary);
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(142, 68, 173, 0.4);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(163, 217, 249, 0.3);
         }
 
         /* 防止出现水平滚动条 */
@@ -412,19 +422,8 @@
 
         /* 响应式调整 */
         @media (max-width: 600px) {
-            .footer-info {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }
-
-            .footer-section {
-                text-align: center;
-                width: 100%;
-            }
-
             .site-footer {
-                padding: 20px 15px;
+                padding: 15px;
             }
 
             h1 {
@@ -485,6 +484,7 @@
 <header>
     <h1>Golang Web 安全实验室</h1>
     <p>Hello Every One, It's Golang-Web-Vulnerability-App, Welcome here.</p>
+    <a href="/logout" class="logout-btn">登出</a>
 </header>
 
 <!-- 磨砂玻璃效果导航栏 -->
@@ -537,17 +537,17 @@
 </section>
 
 <!-- 空指针异常分类 -->
-<section class="vulnerability-category" id="category-nil">
-    <h2>空指针异常 (Nil Error)</h2>
+<section class="vulnerability-category" id="category-npe">
+    <h2>空指针异常 (Null Pointer Exception)</h2>
 
     <div class="vulnerability nil" id="vul-7">
-        <a href="/NilError/NilError1?id=0" class="vulnerability-link">Nil Error 1</a>
-        <div class="payload-box">/NilError/NilError1?id=0</div>
+        <a href="/NullPointerException/NPE1?id=0" class="vulnerability-link">Null Pointer Exception 1</a>
+        <div class="payload-box">/NullPointerException/NPE1?id=0</div>
     </div>
 
     <div class="vulnerability nil" id="vul-8">
-        <a href="/NilError/NilError2?content=0" class="vulnerability-link">Nil Error 2</a>
-        <div class="payload-box">/NilError/NilError2?content=0</div>
+        <a href="/NullPointerException/NPE2?content=0" class="vulnerability-link">Null Pointer Exception 2</a>
+        <div class="payload-box">/NullPointerException/NPE2?content=0</div>
     </div>
 </section>
 
@@ -559,21 +559,23 @@
         <a href="/CommandInjection/cmdi1?url=%68%74%74%70%3a%2f%2f%77%77%77%2e%62%61%69%64%75%2e%63%6f%6d%3b%63%61%74%20%2f%65%74%63%2f%70%61%73%73%77%64"
            class="vulnerability-link">Command Injection 1</a>
         <div class="payload-box" style="white-space: pre;">通过shell解释器执行，shell解析后续参数
-url := r.FormValue("url")
-cmd := exec.Command("sh", "-c", "curl "+url)
+            url := r.FormValue("url")
+            cmd := exec.Command("sh", "-c", "curl "+url)
 
----- Payload ----
-/CommandInjection/cmdi1?url=http://www.baidu.com;cat /etc/passwd</div>
+            ---- Payload ----
+            /CommandInjection/cmdi1?url=http://www.baidu.com;cat /etc/passwd
+        </div>
     </div>
     <div class="vulnerability command" id="vul-18">
         <a href="/CommandInjection/cmdi1?url=http://www.baidu.com"
            class="vulnerability-link">No Command Injection</a>
         <div class="payload-box" style="white-space: pre;">直接执行curl二进制文件
-url := r.FormValue("url")
-cmd := exec.Command("curl", url)
+            url := r.FormValue("url")
+            cmd := exec.Command("curl", url)
 
----- Payload ----
-/CommandInjection/nocmd?url=http://www.baidu.com</div>
+            ---- Payload ----
+            /CommandInjection/nocmd?url=http://www.baidu.com
+        </div>
     </div>
 </section>
 
@@ -630,8 +632,7 @@ cmd := exec.Command("curl", url)
             - xss效果：
             temp=&#x7b;&#x7b;&#x64;&#x65;&#x66;&#x69;&#x6e;&#x65;&#x20;&#x22;&#x54;&#x31;&#x22;&#x7d;&#x7d;&#x3c;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x61;&#x6c;&#x65;&#x72;&#x74;&#x28;&#x31;&#x29;&#x3c;&#x2f;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x7b;&#x7b;&#x65;&#x6e;&#x64;&#x7d;&#x7d;&#x20;&#x7b;&#x7b;&#x74;&#x65;&#x6d;&#x70;&#x6c;&#x61;&#x74;&#x65;&#x20;&#x22;&#x54;&#x31;&#x22;&#x7d;&#x7d;
             - 获取环境变量：
-            temp=&#x7b;&#x7b;&#x2e;&#x55;&#x52;&#x4c;&#x7d;&#x7d;
-        </div>
+            temp=&#x7b;&#x7b;&#x2e;&#x55;&#x52;&#x4c;&#x7d;&#x7d;</div>
     </div>
     <div class="vulnerability ssti" id="vul-16">
         <a href="/SSTI/SSTI2?name={{printf " test"}}" class="vulnerability-link">SSTI 2</a>
@@ -646,192 +647,197 @@ cmd := exec.Command("curl", url)
             name=&#x7b;&#x7b;&#x2e;&#x7d;&#x7d; // 输出全部数据内容
 
             - 调用函数，执行命令：
-            name=&#x7b;&#x7b;&#x2e;&#x53;&#x65;&#x63;&#x72;&#x65;&#x74;&#x20;&#x22;&#x77;&#x68;&#x6f;&#x61;&#x6d;&#x69;&#x22;&#x7d;&#x7d;
-        </div>
+            name=&#x7b;&#x7b;&#x2e;&#x53;&#x65;&#x63;&#x72;&#x65;&#x74;&#x20;&#x22;&#x77;&#x68;&#x6f;&#x61;&#x6d;&#x69;&#x22;&#x7d;&#x7d;</div>
     </div>
-</section>
 
-<!-- 底部项目信息展示 -->
-<footer class="site-footer">
-    <div class="footer-content">
-        <div class="footer-info">
-            <!--            <div class="footer-section">-->
-            <!--                <h3>项目信息</h3>-->
-            <!--                <p><strong>名称：</strong>Golang Web 安全实验室</p>-->
-            <!--                <p><strong>版本：</strong>1.0.0</p>-->
-            <!--                <p><strong>最后更新：</strong>2025-06-06</p>-->
-            <!--            </div>-->
 
+    <!-- URL跳转 -->
+    <section class="vulnerability-category" id="category-redirect">
+        <h2>URL跳转</h2>
+
+        <div class="vulnerability redirect" id="vul-19">
+            <a href="/Redirect/Redirect1?url=/SSRF/SSRF1" class="vulnerability-link">URL跳转 1</a>
+            <div class="payload-box" style="white-space: pre;">场景1，http.Redirect函数</div>
+        </div>
+        <div class="vulnerability redirect" id="vul-20">
+            <a href="/Redirect/Redirect2?url=/SSRF/SSRF1" class="vulnerability-link">URL跳转 2</a>
+            <div class="payload-box" style="white-space: pre;">场景2，手动设置Header</div>
+        </div>
+        <div class="vulnerability redirect" id="vul-21">
+            <a href="/Redirect/Redirect3?url=/SSRF/SSRF1" class="vulnerability-link">URL跳转 3</a>
+            <div class="payload-box" style="white-space: pre;">场景3，HTML元刷新（客户端跳转）</div>
+        </div>
+    </section>
+
+    <!-- 底部项目信息展示 -->
+    <footer class="site-footer">
+        <div class="footer-content">
             <div class="footer-section">
-                <h3>开发者信息</h3>
                 <p><strong>作者：</strong>莱昂纳多</p>
-                <p><strong>邮箱：</strong>623712611@qq.com</p>
-                <p><strong>Github：</strong>https://github.com/bigblackhat</p>
-            </div>
-
-            <div class="footer-section">
-                <h3>代码仓库</h3>
-                <p><strong>GitHub：</strong></p>
                 <p>
+                    <strong>代码仓库：</strong>
                     <a href="https://github.com/bigblackhat/GoVulnWebApp"
                        class="github-link"
                        target="_blank">
-                        https://github.com/bigblackhat/GoVulnWebApp
+                        GitHub项目地址
                     </a>
                 </p>
+                <div class="copyright">
+                    <p>版权所有 &copy; 2025 莱昂纳多 | 保留所有权利</p>
+                    <p>本网站仅供学习研究使用，请遵守相关法律法规</p>
+                </div>
             </div>
         </div>
+    </footer>
 
-        <div class="copyright">
-            <p>版权所有 &copy; 2025-3025 莱昂纳多 | 保留所有权利</p>
-            <p>本网站仅供学习研究使用，请遵守相关法律法规</p>
-        </div>
-    </div>
-</footer>
-
-<script>
-    // 分类结构
-    const categories = [
-        {
-            id: 'category-xss',
-            title: '跨站脚本攻击 (XSS)',
-            vulnerabilities: ['vul-1', 'vul-2', 'vul-3', 'vul-4', 'vul-5']
-        },
-        {
-            id: 'category-sqli',
-            title: 'SQL注入 (SQL Injection)',
-            vulnerabilities: ['vul-6']
-        },
-        {
-            id: 'category-nil',
-            title: '空指针异常 (Nil Error)',
-            vulnerabilities: ['vul-7', 'vul-8']
-        },
-        {
-            id: 'category-command',
-            title: '命令注入 (Command Injection)',
-            vulnerabilities: ['vul-9', 'vul-18']
-        },
-        {
-            id: 'category-upload',
-            title: '路径穿越（Dir Traversal）',
-            vulnerabilities: ['vul-10', "vul-11", 'vul-12', 'vul-13']
-        },
-        {
-            id: 'ssrf',
-            title: '服务端请求伪造（SSRF）',
-            vulnerabilities: ['vul-14', 'vul-17']
-        },
-        {
-            id: 'ssti',
-            title: "服务端模板注入（SSTI）",
-            vulnerabilities: ['vul-15', 'vul-16']
-        }
-    ];
-
-    // 自动生成目录（动态场景）
-    function generateToc() {
-        const tocContainer = document.getElementById('toc-sidebar');
-
-        // 清除现有目录项（保留标题和按钮）
-        while (tocContainer.children.length > 1) {
-            tocContainer.removeChild(tocContainer.lastChild);
-        }
-
-        // 生成分类导航
-        categories.forEach(category => {
-            // 创建分类标题
-            const categoryTitle = document.createElement('div');
-            categoryTitle.className = 'toc-category';
-            categoryTitle.textContent = category.title;
-            categoryTitle.dataset.target = category.id;
-
-            // 创建子菜单容器
-            const subItemsContainer = document.createElement('div');
-            subItemsContainer.className = 'toc-items';
-
-            // 生成子菜单项
-            category.vulnerabilities.forEach(vulId => {
-                const vulElement = document.getElementById(vulId);
-                if (vulElement) {
-                    const title = vulElement.querySelector('.vulnerability-link').textContent;
-                    const tocItem = document.createElement('div');
-                    tocItem.className = 'toc-item';
-                    tocItem.dataset.target = vulId;
-                    tocItem.textContent = title;
-                    subItemsContainer.appendChild(tocItem);
-                }
-            });
-
-            // 添加到导航栏
-            tocContainer.appendChild(categoryTitle);
-            tocContainer.appendChild(subItemsContainer);
-        });
-    }
-
-    // 点击滚动定位
-    function setupTocNavigation() {
-        // 漏洞项点击事件
-        document.querySelectorAll('.toc-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const target = document.getElementById(item.dataset.target);
-                if (target) {
-                    target.scrollIntoView({behavior: 'smooth', block: 'center'});
-                }
-            });
-        });
-
-        // 分类标题点击事件
-        document.querySelectorAll('.toc-category').forEach(category => {
-            category.addEventListener('click', function () {
-                this.classList.toggle('expanded');
-
-                // 点击分类标题时也滚动到该分类
-                const target = document.getElementById(this.dataset.target);
-                if (target) {
-                    target.scrollIntoView({behavior: 'smooth', block: 'start'});
-                }
-            });
-        });
-    }
-
-    // 导航栏收起/展开功能
-    function setupTocToggle() {
-        const toggleBtn = document.querySelector('.toggle-btn');
-        const tocSidebar = document.getElementById('toc-sidebar');
-
-        toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // 防止事件冒泡
-            tocSidebar.classList.toggle('collapsed');
-            // 更新按钮文本
-            toggleBtn.textContent = tocSidebar.classList.contains('collapsed') ? '≡' : '×';
-        });
-
-        // 点击导航栏外部时收起
-        document.addEventListener('click', (e) => {
-            if (!tocSidebar.contains(e.target) && !tocSidebar.classList.contains('collapsed')) {
-                tocSidebar.classList.add('collapsed');
-                toggleBtn.textContent = '≡';
+    <script>
+        // 分类结构
+        const categories = [
+            {
+                id: 'category-xss',
+                title: '跨站脚本攻击 (XSS)',
+                vulnerabilities: ['vul-1', 'vul-2', 'vul-3', 'vul-4', 'vul-5']
+            },
+            {
+                id: 'category-sqli',
+                title: 'SQL注入 (SQL Injection)',
+                vulnerabilities: ['vul-6']
+            },
+            {
+                id: 'category-npe',
+                title: '空指针异常 (Null Pointer Exception)',
+                vulnerabilities: ['vul-7', 'vul-8']
+            },
+            {
+                id: 'category-command',
+                title: '命令注入 (Command Injection)',
+                vulnerabilities: ['vul-9', 'vul-18']
+            },
+            {
+                id: 'category-upload',
+                title: '路径穿越（Dir Traversal）',
+                vulnerabilities: ['vul-10', "vul-11", 'vul-12', 'vul-13']
+            },
+            {
+                id: 'ssrf',
+                title: '服务端请求伪造（SSRF）',
+                vulnerabilities: ['vul-14', 'vul-17']
+            },
+            {
+                id: 'ssti',
+                title: "服务端模板注入（SSTI）",
+                vulnerabilities: ['vul-15', 'vul-16']
+            },
+            {
+                id: 'redirect',
+                title: "URL跳转",
+                vulnerabilities: ['vul-19', 'vul-20', 'vul-21']
             }
-        });
-    }
+        ];
 
-    // 初始化所有功能
-    window.addEventListener('DOMContentLoaded', () => {
-        generateToc();
-        setupTocNavigation();
-        setupTocToggle();
+        // 自动生成目录（动态场景）
+        function generateToc() {
+            const tocContainer = document.getElementById('toc-sidebar');
 
-        // 默认展开所有分类
-        document.querySelectorAll('.toc-category').forEach(category => {
-            category.classList.add('expanded');
-        });
+            // 清除现有目录项（保留标题和按钮）
+            while (tocContainer.children.length > 1) {
+                tocContainer.removeChild(tocContainer.lastChild);
+            }
 
-        // 添加页面加载动画
-        document.querySelectorAll('.vulnerability-category, .vulnerability').forEach(el => {
-            el.style.opacity = '0';
+            // 生成分类导航
+            categories.forEach(category => {
+                // 创建分类标题
+                const categoryTitle = document.createElement('div');
+                categoryTitle.className = 'toc-category';
+                categoryTitle.textContent = category.title;
+                categoryTitle.dataset.target = category.id;
+
+                // 创建子菜单容器
+                const subItemsContainer = document.createElement('div');
+                subItemsContainer.className = 'toc-items';
+
+                // 生成子菜单项
+                category.vulnerabilities.forEach(vulId => {
+                    const vulElement = document.getElementById(vulId);
+                    if (vulElement) {
+                        const title = vulElement.querySelector('.vulnerability-link').textContent;
+                        const tocItem = document.createElement('div');
+                        tocItem.className = 'toc-item';
+                        tocItem.dataset.target = vulId;
+                        tocItem.textContent = title;
+                        subItemsContainer.appendChild(tocItem);
+                    }
+                });
+
+                // 添加到导航栏
+                tocContainer.appendChild(categoryTitle);
+                tocContainer.appendChild(subItemsContainer);
+            });
+        }
+
+        // 点击滚动定位
+        function setupTocNavigation() {
+            // 漏洞项点击事件
+            document.querySelectorAll('.toc-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const target = document.getElementById(item.dataset.target);
+                    if (target) {
+                        target.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    }
+                });
+            });
+
+            // 分类标题点击事件
+            document.querySelectorAll('.toc-category').forEach(category => {
+                category.addEventListener('click', function () {
+                    this.classList.toggle('expanded');
+
+                    // 点击分类标题时也滚动到该分类
+                    const target = document.getElementById(this.dataset.target);
+                    if (target) {
+                        target.scrollIntoView({behavior: 'smooth', block: 'start'});
+                    }
+                });
+            });
+        }
+
+        // 导航栏收起/展开功能
+        function setupTocToggle() {
+            const toggleBtn = document.querySelector('.toggle-btn');
+            const tocSidebar = document.getElementById('toc-sidebar');
+
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 防止事件冒泡
+                tocSidebar.classList.toggle('collapsed');
+                // 更新按钮文本
+                toggleBtn.textContent = tocSidebar.classList.contains('collapsed') ? '≡' : '×';
+            });
+
+            // 点击导航栏外部时收起
+            document.addEventListener('click', (e) => {
+                if (!tocSidebar.contains(e.target) && !tocSidebar.classList.contains('collapsed')) {
+                    tocSidebar.classList.add('collapsed');
+                    toggleBtn.textContent = '≡';
+                }
+            });
+        }
+
+        // 初始化所有功能
+        window.addEventListener('DOMContentLoaded', () => {
+            generateToc();
+            setupTocNavigation();
+            setupTocToggle();
+
+            // 默认展开所有分类
+            document.querySelectorAll('.toc-category').forEach(category => {
+                category.classList.add('expanded');
+            });
+
+            // 添加页面加载动画
+            document.querySelectorAll('.vulnerability-category, .vulnerability').forEach(el => {
+                el.style.opacity = '0';
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

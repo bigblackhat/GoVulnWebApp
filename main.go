@@ -6,20 +6,90 @@ import (
 	"flag"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-jwt/jwt"
+	_ "github.com/golang-jwt/jwt"
 	"html/template"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 )
+
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie := r.Header.Get("Cookie")
+		//referer := r.Header.Get("referer")
+		//referer = referer + "#"
+		if !strings.Contains(cookie, "username=admin") {
+			//if !strings.HasSuffix(referer, "/login") {
+			//w.WriteHeader(http.StatusUnauthorized)
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		next(w, r)
+	}
+}
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("tpl/index.html")
+	//t, err := template.ParseFiles("test/tmp.html")
 	if err != nil {
 		w.Write([]byte(err.Error()))
 		return // 确保返回
 	}
 	t.Execute(w, nil)
+}
+
+func generateJWT(username string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user": username,
+		"exp":  time.Now().Add(24 * time.Hour).Unix(),
+	})
+	return token.SignedString([]byte("your-secret-key"))
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		t, err := template.ParseFiles("tpl/login.html")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		t.Execute(w, nil)
+	} else {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		if username == "" || password == "" {
+			w.Write([]byte("username or password is empty"))
+			return
+		}
+		if username == "admin" && password == "123456" {
+			// 创建 Cookie 对象
+			cookie := &http.Cookie{
+				Name:   "username",
+				Value:  "admin",
+				MaxAge: 3600, // 有效期（秒）
+			}
+			// 添加到响应头
+			http.SetCookie(w, cookie)
+			http.Redirect(w, r, "/", http.StatusFound)
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+	}
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	delCookie := &http.Cookie{Name: "username", MaxAge: -1}
+	http.SetCookie(w, delCookie)
+	files, err := template.ParseFiles("tpl/logout.html")
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	files.Execute(w, nil)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +158,12 @@ func WebServerRun(port int) {
 	fmt.Println("Go-Web, Listening on port:", port)
 	fmt.Println(banner)
 
-	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/index", AuthMiddleware(indexHandler))
+	http.HandleFunc("/", AuthMiddleware(indexHandler))
+	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/logout", logoutHandler)
+
+	// 测试handler
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/QueryUserById", pkg.QueryUserById)
 	http.HandleFunc("/QueryMultiUser", pkg.QueryMultiUser)
@@ -98,36 +173,41 @@ func WebServerRun(port int) {
 
 	// 以下是靶场路由
 	// 跨站脚本攻击
-	http.HandleFunc("/XSS/reflectXSS1", pkg.ReflectXSS1)
-	http.HandleFunc("/XSS/reflectXSS2", pkg.ReflectXSS2)
-	http.HandleFunc("/XSS/reflectXSS3", pkg.ReflectXSS3)
-	http.HandleFunc("/XSS/reflectXSS4", pkg.ReflectXSS4)
-	http.HandleFunc("/XSS/NoXSS1", pkg.NoXSS1)
+	http.HandleFunc("/XSS/reflectXSS1", AuthMiddleware(pkg.ReflectXSS1))
+	http.HandleFunc("/XSS/reflectXSS2", AuthMiddleware(pkg.ReflectXSS2))
+	http.HandleFunc("/XSS/reflectXSS3", AuthMiddleware(pkg.ReflectXSS3))
+	http.HandleFunc("/XSS/reflectXSS4", AuthMiddleware(pkg.ReflectXSS4))
+	http.HandleFunc("/XSS/NoXSS1", AuthMiddleware(pkg.NoXSS1))
 
 	// SQL注入
-	http.HandleFunc("/SQLi/SQLi1", pkg.SQLi1)
+	http.HandleFunc("/SQLi/SQLi1", AuthMiddleware(pkg.SQLi1))
 
 	// 空指针异常
-	http.HandleFunc("/NullPointerException/NPE1", pkg.NPE1)
-	http.HandleFunc("/NullPointerException/NPE2", pkg.NPE2)
+	http.HandleFunc("/NullPointerException/NPE1", AuthMiddleware(pkg.NPE1))
+	http.HandleFunc("/NullPointerException/NPE2", AuthMiddleware(pkg.NPE2))
 
 	// 命令注入
-	http.HandleFunc("/CommandInjection/cmdi1", pkg.Cmdi1)
-	http.HandleFunc("/CommandInjection/nocmd", pkg.NoCmdi)
+	http.HandleFunc("/CommandInjection/cmdi1", AuthMiddleware(pkg.Cmdi1))
+	http.HandleFunc("/CommandInjection/nocmd", AuthMiddleware(pkg.NoCmdi))
 
 	// 路径穿越
-	http.HandleFunc("/DirTraversal/FileRead", pkg.FileRead)
-	http.HandleFunc("/DirTraversal/FileWrite", pkg.FileWrite)
-	http.HandleFunc("/DirTraversal/FileDelete", pkg.FileDelete)
-	http.HandleFunc("/DirTraversal/FileUpload", pkg.FileUpload)
+	http.HandleFunc("/DirTraversal/FileRead", AuthMiddleware(pkg.FileRead))
+	http.HandleFunc("/DirTraversal/FileWrite", AuthMiddleware(pkg.FileWrite))
+	http.HandleFunc("/DirTraversal/FileDelete", AuthMiddleware(pkg.FileDelete))
+	http.HandleFunc("/DirTraversal/FileUpload", AuthMiddleware(pkg.FileUpload))
 
 	// SSRF
-	http.HandleFunc("/SSRF/SSRF1", pkg.SSRF1)
-	http.HandleFunc("/SSRF/NoSSRF", pkg.NoSSRF)
+	http.HandleFunc("/SSRF/SSRF1", AuthMiddleware(pkg.SSRF1))
+	http.HandleFunc("/SSRF/NoSSRF", AuthMiddleware(pkg.NoSSRF))
 
 	// SSTI
-	http.HandleFunc("/SSTI/SSTI1", pkg.SSTI1)
-	http.HandleFunc("/SSTI/SSTI2", pkg.SSTI2)
+	http.HandleFunc("/SSTI/SSTI1", AuthMiddleware(pkg.SSTI1))
+	http.HandleFunc("/SSTI/SSTI2", AuthMiddleware(pkg.SSTI2))
+
+	// URL跳转
+	http.HandleFunc("/Redirect/Redirect1", AuthMiddleware(pkg.Redirect1))
+	http.HandleFunc("/Redirect/Redirect2", AuthMiddleware(pkg.Redirect2))
+	http.HandleFunc("/Redirect/Redirect3", AuthMiddleware(pkg.Redirect3))
 
 	// 创建自定义HTTP服务器实例，直接使用已检测过的listener
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))

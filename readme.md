@@ -66,6 +66,8 @@ Visit: http://localhost:8080
 ### v1.3
 * 优化服务器启动相关逻辑（模板出错时提示）
 * 增加NoCmdi漏洞demo
+* 增加权限机制（登入、登出、接口鉴权等）
+* 增加url跳转漏洞demo
 ### v1.2
 * 更新index.html
 * 增加SSTI、SSRF

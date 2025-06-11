@@ -11,9 +11,10 @@ import (
 type user struct {
 	Id         int
 	Name       string
+	Passwd     string
+	Level      int
 	Mail       string
 	Age        int
-	Passwd     string
 	Create_at  []uint8
 	Updated_at []uint8
 }

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登出成功</title>
+    <style>
+        /* 小清新风格 - 浅绿/薄荷色系 */
+        body {
+            background-color: #f0faf7; /* 浅薄荷绿背景 */
+            font-family: 'Microsoft YaHei', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(126, 217, 187, 0.15);
+            text-align: center;
+        }
+
+        h1 {
+            color: #2e9dcc; /* 清新绿色 */
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .message {
+            color: #1a2495; /* 深绿色 */
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db; /* 蓝色强调色 */
+            margin: 20px 0;
+        }
+
+        .leaf-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            fill: #2ebacc; /* 叶子图标颜色 */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 清新叶子图标 -->
+    <svg class="leaf-icon" viewBox="0 0 24 24">
+        <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22C6.42,20.67 7.71,18.67 9.54,16.37C13,15 17,15 17,15C17,15 17,13 17,8M17,3C16,3 15.62,4.3 15.5,5.24L12,5.1C9.82,5.03 8.45,6.22 8.08,8.5C7.5,10.5 7,12 7,12C7.28,13.72 8,14.5 8.5,14.5C8.72,14.5 9.11,14.34 9.5,14C10.28,13.22 11.05,12.43 12,12.13C12.94,11.83 14,11.5 15,11.5C16.5,11.5 17,10.5 17,8C17,5.5 17,3 17,3Z"/>
+    </svg>
+
+    <h1>您已成功登出</h1>
+
+    <div class="message">
+        感谢使用我们的服务，期待您的再次归来
+    </div>
+
+    <div class="countdown" id="countdown">3</div>
+    <div>秒后自动跳转至登录页面</div>
+</div>
+
+<script>
+    // 倒计时跳转实现
+    let seconds = 3;
+    const countdownEl = document.getElementById('countdown');
+
+    // 倒计时动画
+    const timer = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+
+        // 添加缩放动画效果
+        countdownEl.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+            countdownEl.style.transform = 'scale(1)';
+        }, 300);
+
+        if(seconds <= 0) {
+            clearInterval(timer);
+            window.location.href = "/login";  // 跳转到登录页
+        }
+    }, 1000);
+</script>
+</body>
+</html>
