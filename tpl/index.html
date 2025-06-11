@@ -556,9 +556,24 @@
     <h2>命令注入 (Command Injection)</h2>
 
     <div class="vulnerability command" id="vul-9">
-        <a href="/CommandInjection/cmdi1?url=%68%74%74%70%3a%2f%2f%77%77%77%2e%62%61%69%64%75%2e%63%6f%6d%20%3b%20%63%61%74%20%2f%65%74%63%2f%70%61%73%73%77%64"
+        <a href="/CommandInjection/cmdi1?url=%68%74%74%70%3a%2f%2f%77%77%77%2e%62%61%69%64%75%2e%63%6f%6d%3b%63%61%74%20%2f%65%74%63%2f%70%61%73%73%77%64"
            class="vulnerability-link">Command Injection 1</a>
-        <div class="payload-box">/CommandInjection/cmdi1?url=http://www.baidu.com ; cat /etc/passwd</div>
+        <div class="payload-box" style="white-space: pre;">通过shell解释器执行，shell解析后续参数
+url := r.FormValue("url")
+cmd := exec.Command("sh", "-c", "curl "+url)
+
+---- Payload ----
+/CommandInjection/cmdi1?url=http://www.baidu.com;cat /etc/passwd</div>
+    </div>
+    <div class="vulnerability command" id="vul-18">
+        <a href="/CommandInjection/cmdi1?url=http://www.baidu.com"
+           class="vulnerability-link">No Command Injection</a>
+        <div class="payload-box" style="white-space: pre;">直接执行curl二进制文件
+url := r.FormValue("url")
+cmd := exec.Command("curl", url)
+
+---- Payload ----
+/CommandInjection/nocmd?url=http://www.baidu.com</div>
     </div>
 </section>
 
@@ -580,7 +595,7 @@
     </div>
     <div class="vulnerability dirtrav" id="vul-13">
         <a href="/DirTraversal/FileUpload" class="vulnerability-link">任意文件上传</a>
-        <div class="payload-box">无</div>
+        <div class="payload-box">场景1，无任何防护的任意文件上传</div>
     </div>
 </section>
 
@@ -590,11 +605,15 @@
 
     <div class="vulnerability ssrf" id="vul-14">
         <a href="/SSRF/SSRF1?url=https://www.baidu.com" class="vulnerability-link">SSRF 1</a>
-        <div class="payload-box">/SSRF/SSRF1?url=https://www.baidu.com</div>
+        <div class="payload-box" style="white-space: pre;">场景1，url为用户完全可控
+            /SSRF/SSRF1?url=https://www.baidu.com
+        </div>
     </div>
     <div class="vulnerability ssrf" id="vul-17">
         <a href="/SSRF/NoSSRF?path=go/go-program-structure.html" class="vulnerability-link">No SSRF</a>
-        <div class="payload-box">/SSRF/NoSSRF?path=go/go-program-structure.html</div>
+        <div class="payload-box" style="white-space: pre;">安全用例，用户仅可控制path部分内容
+            /SSRF/NoSSRF?path=go/go-program-structure.html
+        </div>
     </div>
 </section>
 
@@ -603,12 +622,32 @@
     <h2>服务端模板注入 (SSTI)</h2>
 
     <div class="vulnerability ssti" id="vul-15">
-        <a href="/SSTI/SSTI1" class="vulnerability-link">SSTI 1</a>
-        <div class="payload-box">/SSRF/SSRF1?url=https://www.baidu.com</div>
+        <a href="/SSTI/SSTI1?temp={{printf " Hello"}}" class="vulnerability-link">SSTI 1</a>
+        <div class="payload-box" style="white-space: pre;">场景1，模板为用户完全可控
+
+            - 输出任意内容：
+            temp=&#x7b;&#x7b;&#x22;&#x48;&#x65;&#x6c;&#x6c;&#x6f;&#x22;&#x7d;&#x7d;
+            - xss效果：
+            temp=&#x7b;&#x7b;&#x64;&#x65;&#x66;&#x69;&#x6e;&#x65;&#x20;&#x22;&#x54;&#x31;&#x22;&#x7d;&#x7d;&#x3c;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x61;&#x6c;&#x65;&#x72;&#x74;&#x28;&#x31;&#x29;&#x3c;&#x2f;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3e;&#x7b;&#x7b;&#x65;&#x6e;&#x64;&#x7d;&#x7d;&#x20;&#x7b;&#x7b;&#x74;&#x65;&#x6d;&#x70;&#x6c;&#x61;&#x74;&#x65;&#x20;&#x22;&#x54;&#x31;&#x22;&#x7d;&#x7d;
+            - 获取环境变量：
+            temp=&#x7b;&#x7b;&#x2e;&#x55;&#x52;&#x4c;&#x7d;&#x7d;
+        </div>
     </div>
     <div class="vulnerability ssti" id="vul-16">
-        <a href="/SSTI/SSTI2" class="vulnerability-link">SSTI 2</a>
-        <div class="payload-box">/SSRF/SSRF1?url=https://www.baidu.com</div>
+        <a href="/SSTI/SSTI2?name={{printf " test"}}" class="vulnerability-link">SSTI 2</a>
+        <div class="payload-box" style="white-space: pre;">场景2，模板内容部分为用户可控
+
+            - 输出任意内容：
+            name=&#x7b;&#x7b;&#x70;&#x72;&#x69;&#x6e;&#x74;&#x66;&#x20;&#x22;&#x31;&#x22;&#x7d;&#x7d;
+
+            - 获取环境变量：
+            name=&#x7b;&#x7b;&#x2e;&#x4e;&#x61;&#x6d;&#x65;&#x7d;&#x7d;&#x2c;&#x7b;&#x7b;&#x2e;&#x50;&#x61;&#x73;&#x73;&#x77;&#x6f;&#x72;&#x64;&#x7d;&#x7d;
+            // 输出指定数据内容
+            name=&#x7b;&#x7b;&#x2e;&#x7d;&#x7d; // 输出全部数据内容
+
+            - 调用函数，执行命令：
+            name=&#x7b;&#x7b;&#x2e;&#x53;&#x65;&#x63;&#x72;&#x65;&#x74;&#x20;&#x22;&#x77;&#x68;&#x6f;&#x61;&#x6d;&#x69;&#x22;&#x7d;&#x7d;
+        </div>
     </div>
 </section>
 
@@ -671,7 +710,7 @@
         {
             id: 'category-command',
             title: '命令注入 (Command Injection)',
-            vulnerabilities: ['vul-9']
+            vulnerabilities: ['vul-9', 'vul-18']
         },
         {
             id: 'category-upload',

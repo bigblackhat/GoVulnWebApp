@@ -23,3 +23,14 @@ func Cmdi1(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "下载成功！输出：\n%s", output)
 }
+
+func NoCmdi(w http.ResponseWriter, r *http.Request) {
+	url := r.FormValue("url")
+	cmd := exec.Command("curl", url)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		http.Error(w, "下载失败: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, "下载成功！输出：\n%s", output)
+}

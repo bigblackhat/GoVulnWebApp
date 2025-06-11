@@ -14,7 +14,11 @@ import (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("tpl/index.html")
+	t, err := template.ParseFiles("tpl/index.html")
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return // 确保返回
+	}
 	t.Execute(w, nil)
 }
 
@@ -109,6 +113,7 @@ func WebServerRun(port int) {
 
 	// 命令注入
 	http.HandleFunc("/CommandInjection/cmdi1", pkg.Cmdi1)
+	http.HandleFunc("/CommandInjection/nocmd", pkg.NoCmdi)
 
 	// 路径穿越
 	http.HandleFunc("/DirTraversal/FileRead", pkg.FileRead)

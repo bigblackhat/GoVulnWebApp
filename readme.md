@@ -63,10 +63,13 @@ Visit: http://localhost:8080
 
 ## version log
 
+### v1.3
+* 优化服务器启动相关逻辑（模板出错时提示）
+* 增加NoCmdi漏洞demo
 ### v1.2
 * 更新index.html
 * 增加SSTI、SSRF
-* 优化服务器启动相关逻辑
+* 优化服务器启动相关逻辑（端口占用时提示）
 ### v1.1
 * 增加路径穿越类漏洞（任意文件操作）
 * 增加index.html界面
