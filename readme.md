@@ -76,7 +76,12 @@ Visit: http://localhost:8080
 - [ ] 越权，未授权等
 - [ ] 应用Gin框架
 
-## version log
+## Version Log
+
+### v1.5
+
+* 优化了权限机制，全面接入jwt
+* 代码解耦
 
 ### v1.4
 
