@@ -14,7 +14,7 @@ cd GoVulnWebApp
 go build -o server
 ```
 
-将gwva.sql导入Mysql，然后启动项目：
+**将gwva.sql导入Mysql**，然后启动项目：
 
 ```shell
 ./server
