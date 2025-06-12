@@ -1,18 +1,25 @@
 # Golang Web靶场
 
-
 ![GoVulnWebApp](https://socialify.git.ci/bigblackhat/GoVulnWebApp/image?description=1&font=KoHo&forks=1&issues=1&owner=1&pattern=Signal&pulls=1&stargazers=1&theme=Auto)
 
 ---
 
 ## 项目部署
-下载项目后执行如下命令：
+
+下载项目后执行如下命令部署：
+
 ```shell
 git clone https://github.com/bigblackhat/GoVulnWebApp.git GoVulnWebApp
 cd GoVulnWebApp
 go build -o server
+```
+
+将gwva.sql导入Mysql，然后启动项目：
+
+```shell
 ./server
 ```
+
 访问地址：http://127.0.0.1:8080 进入靶场。
 
 也可以指定启动端口：`./server -port=8081`。
@@ -20,6 +27,7 @@ go build -o server
 ### 演示
 
 项目启动：
+
 ```shell
 leo:~/GoVulnWebApp (main *%) $ ./server
 Go-Web, Listening on port: 8080
@@ -41,6 +49,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Server is running...
 Visit: http://localhost:8080
 ```
+
 浏览器访问：http://localhost:8080
 
 ![](img/login.png)
@@ -50,7 +59,6 @@ Visit: http://localhost:8080
 开始玩转靶场～
 
 ![](img/index.png)
-
 
 ## Todo
 
@@ -68,29 +76,37 @@ Visit: http://localhost:8080
 - [ ] 越权，未授权等
 - [ ] 应用Gin框架
 
-
 ## version log
 
 ### v1.4
+
 * 优化鉴权
 * 优化数据库与SQLi-demo
 * 增加注册功能
 * 增加越权漏洞
+* 增加初始化数据库文件
+
 ### v1.3
+
 * 优化服务器启动相关逻辑（模板出错时提示）
 * 增加NoCmdi漏洞demo
 * 增加权限机制（登入、登出、接口鉴权等）
 * 增加url跳转、权限绕过等漏洞demo
+
 ### v1.2
+
 * 更新index.html
 * 增加SSTI、SSRF
 * 优化服务器启动相关逻辑（端口占用时提示）
+
 ### v1.1
+
 * 增加路径穿越类漏洞（任意文件操作）
 * 增加index.html界面
-### v1.0
-* 基础漏洞类型：XSS、SQL注入、空指针异常、命令注入
 
+### v1.0
+
+* 基础漏洞类型：XSS、SQL注入、空指针异常、命令注入
 
 ## Thanks
 
