@@ -41,12 +41,16 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Server is running...
 Visit: http://localhost:8080
 ```
+浏览器访问：http://localhost:8080
 
-界面展示：
+![](img/login.png)
+
+默认管理员账号密码：admin/123456
+
+开始玩转靶场～
 
 ![](img/index.png)
 
-默认管理员账号密码：admin/123456
 
 ## Todo
 
