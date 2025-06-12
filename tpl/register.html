@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账户注册 | 清新蓝</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', '微软雅黑', sans-serif;
+        }
+
+        body {
+            background-color: #e6f7ff; /* 淡蓝背景 */
+            background-image: linear-gradient(120deg, #e6f7ff 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(77, 168, 218, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(77, 168, 218, 0.3);
+        }
+
+        h1 {
+            color: #0077b6;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #0077b6;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid rgba(77, 168, 218, 0.5);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4da8da;
+            box-shadow: 0 0 0 3px rgba(77, 168, 218, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* 按钮样式 */
+        .submit-btn {
+            background: linear-gradient(to right, #4da8da, #0077b6);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 15px rgba(77, 168, 218, 0.4);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            input {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>创建账户</h1>
+    <form action="/register" method="POST">
+        <!-- 用户名 -->
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="输入2-16位字符"
+                    required
+            >
+        </div>
+
+        <!-- 密码 -->
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="至少包含字母和数字"
+                    minlength="1"
+                    required
+            >
+        </div>
+
+        <!-- 邮箱 -->
+        <div class="form-group">
+            <label for="email">电子邮箱</label>
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="name@example.com"
+                    required
+            >
+        </div>
+
+        <button type="submit" class="submit-btn">创建账户</button>
+    </form>
+</div>
+</body>
+</html>

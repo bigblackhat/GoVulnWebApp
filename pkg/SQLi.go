@@ -9,20 +9,17 @@ import (
 )
 
 type user struct {
-	Id         int
-	Name       string
-	Passwd     string
-	Level      int
-	Mail       string
-	Age        int
-	Create_at  []uint8
-	Updated_at []uint8
+	Id     int
+	Name   string
+	Passwd string
+	Level  int
+	Mail   string
 }
 
 var db *sql.DB
 
 func InitDB() (db *sql.DB, err error) {
-	db_config := "root:12345678@tcp(127.0.0.1:3306)/vulnapp"
+	db_config := "root:12345678@tcp(127.0.0.1:3306)/gwva"
 	db, err = sql.Open("mysql", db_config)
 	if err != nil {
 		//panic(err.Error())
@@ -41,13 +38,31 @@ func InitDB() (db *sql.DB, err error) {
 	return db, nil
 }
 
+func SQLi1(w http.ResponseWriter, req *http.Request) {
+	var err error
+	db, err = InitDB()
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	id := req.FormValue("id")
+	sqlStr := fmt.Sprintf("select name from manager where id = %s", id)
+	var name string
+	err = db.QueryRow(sqlStr).Scan(&name)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	fmt.Fprintf(w, "name is %s", name)
+}
+
 func QueryUserById(w http.ResponseWriter, req *http.Request) {
 	var err error
 	db, err = InitDB()
 
 	sqlStr := "select * from vulnapp.user where id=?"
 	var u user
-	err = db.QueryRow(sqlStr, 1).Scan(&u.Id, &u.Name, &u.Mail, &u.Age, &u.Passwd, &u.Create_at, &u.Updated_at)
+	err = db.QueryRow(sqlStr, 1).Scan(&u.Id, &u.Name, &u.Mail, &u.Passwd)
 	if err != nil {
 		w.Write([]byte(err.Error()))
 		return
@@ -74,11 +89,11 @@ func QueryMultiUser(w http.ResponseWriter, req *http.Request) {
 
 	for rows.Next() {
 		var u user
-		err = rows.Scan(&u.Id, &u.Name, &u.Mail, &u.Age, &u.Passwd, &u.Create_at, &u.Updated_at)
+		err = rows.Scan(&u.Id, &u.Name, &u.Mail, &u.Passwd)
 		if err != nil {
 			w.Write([]byte(err.Error()))
 		}
-		fmt.Fprintf(w, "id: %d, name: %s, mail: %s, age: %s, passwd: %s, create_at: %s, update_at: %s\n", u.Id, u.Name, u.Mail, u.Age, u.Passwd, u.Create_at, u.Updated_at)
+		fmt.Fprintf(w, "id: %d, name: %s, mail: %s, age: %s, passwd: %s, create_at: %s, update_at: %s\n", u.Id, u.Name, u.Mail, u.Passwd)
 	}
 }
 
@@ -129,22 +144,4 @@ func DeleteUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "delete success,id is %d", ret)
-}
-
-func SQLi1(w http.ResponseWriter, req *http.Request) {
-	var err error
-	db, err = InitDB()
-	if err != nil {
-		w.Write([]byte(err.Error()))
-		return
-	}
-	id := req.FormValue("id")
-	sqlStr := fmt.Sprintf("select name from user where id = '%s'", id)
-	var name string
-	err = db.QueryRow(sqlStr).Scan(&name)
-	if err != nil {
-		w.Write([]byte(err.Error()))
-		return
-	}
-	fmt.Fprintf(w, "name is %s", name)
 }

@@ -46,6 +46,8 @@ Visit: http://localhost:8080
 
 ![](img/index.png)
 
+默认管理员账号密码：admin/123456
+
 ## Todo
 
 - [x] 反射型XSS
@@ -57,17 +59,24 @@ Visit: http://localhost:8080
 - [x] 任意文件读取、写、删除、上传
 - [x] 服务端请求伪造（SSRF）
 - [x] 服务端模板注入（SSTI）
+- [x] url跳转
+- [x] 权限绕过
 - [ ] 越权，未授权等
 - [ ] 应用Gin框架
 
 
 ## version log
 
+### v1.4
+* 优化鉴权
+* 优化数据库与SQLi-demo
+* 增加注册功能
+* 增加越权漏洞
 ### v1.3
 * 优化服务器启动相关逻辑（模板出错时提示）
 * 增加NoCmdi漏洞demo
 * 增加权限机制（登入、登出、接口鉴权等）
-* 增加url跳转漏洞demo
+* 增加url跳转、权限绕过等漏洞demo
 ### v1.2
 * 更新index.html
 * 增加SSTI、SSRF

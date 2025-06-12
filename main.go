@@ -13,18 +13,19 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 )
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie := r.Header.Get("Cookie")
-		//referer := r.Header.Get("referer")
-		//referer = referer + "#"
-		if !strings.Contains(cookie, "username=admin") {
-			//if !strings.HasSuffix(referer, "/login") {
-			//w.WriteHeader(http.StatusUnauthorized)
+		c, err := r.Cookie("username")
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		value := c.Value
+		if value == "" {
 			http.Redirect(w, r, "/login", http.StatusFound)
 			return
 		}
@@ -50,6 +51,53 @@ func generateJWT(username string) (string, error) {
 	return token.SignedString([]byte("your-secret-key"))
 }
 
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		t, err := template.ParseFiles("tpl/register.html")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		t.Execute(w, nil)
+	} else {
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		var level string
+		level = r.FormValue(level)
+		if level == "" {
+			level = "2"
+		}
+		levelInt, _ := strconv.Atoi(level)
+
+		email := r.FormValue("email")
+
+		if username == "" || password == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("账号或密码不能为空"))
+			return
+		}
+
+		var err error
+		db, err := pkg.InitDB()
+		sql := "select name from manager where name =?"
+		var name string
+		_ = db.QueryRow(sql, username).Scan(&name) // 抛弃error
+		if name != "" {
+			w.Write([]byte("账号已存在"))
+			return
+		}
+
+		sql = "insert into manager(name,passwd,level,mail) values(?,?,?,?)"
+		_, err = db.Exec(sql, username, password, levelInt, email)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		//w.Write([]byte("注册成功"))
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+}
+
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		t, err := template.ParseFiles("tpl/login.html")
@@ -65,11 +113,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("username or password is empty"))
 			return
 		}
-		if username == "admin" && password == "123456" {
+		db, err := pkg.InitDB()
+		sql := "select name from manager where name =? and passwd=?"
+		var name string
+		err = db.QueryRow(sql, username, password).Scan(&name)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		if name != "" {
 			// 创建 Cookie 对象
 			cookie := &http.Cookie{
 				Name:   "username",
-				Value:  "admin",
+				Value:  name,
 				MaxAge: 3600, // 有效期（秒）
 			}
 			// 添加到响应头
@@ -161,6 +217,7 @@ func WebServerRun(port int) {
 	http.HandleFunc("/index", AuthMiddleware(indexHandler))
 	http.HandleFunc("/", AuthMiddleware(indexHandler))
 	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/logout", logoutHandler)
 
 	// 测试handler

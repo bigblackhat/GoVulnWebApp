@@ -531,8 +531,8 @@
     <h2>SQL注入 (SQL Injection)</h2>
 
     <div class="vulnerability sqli" id="vul-6">
-        <a href="/SQLi/SQLi1?id=100'+or+sleep(1)--+-" class="vulnerability-link">SQLi 1</a>
-        <div class="payload-box">/SQLi/SQLi1?id=100'+or+sleep(1)--+-</div>
+        <a href="/SQLi/SQLi1?id=1+and+sleep(1)--+-" class="vulnerability-link">SQLi 1</a>
+        <div class="payload-box">/SQLi/SQLi1?id=1+and+sleep(1)--+-</div>
     </div>
 </section>
 
@@ -666,6 +666,20 @@
         <div class="vulnerability redirect" id="vul-21">
             <a href="/Redirect/Redirect3?url=/SSRF/SSRF1" class="vulnerability-link">URL跳转 3</a>
             <div class="payload-box" style="white-space: pre;">场景3，HTML元刷新（客户端跳转）</div>
+        </div>
+    </section>
+
+    <!-- 越权类漏洞（Privilege Escalation） -->
+    <section class="vulnerability-category" id="category-pe">
+        <h2>越权类漏洞（Privilege Escalation）</h2>
+
+        <div class="vulnerability pe" id="vul-22">
+            <a href="/" class="vulnerability-link">鉴权绕过</a>
+            <div class="payload-box" style="white-space: pre;">cookie头写：username=admin，即可以admin身份访问</div>
+        </div>
+        <div class="vulnerability pe" id="vul-23">
+            <a href="/" class="vulnerability-link">任意管理员账号注册</a>
+            <div class="payload-box" style="white-space: pre;">隐藏参数level，赋值1，即可注册管理员账户</div>
         </div>
     </section>
 
