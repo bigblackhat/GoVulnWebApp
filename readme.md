@@ -75,7 +75,7 @@ Visit: http://localhost:8080
 * JWT-Key硬编码
 * 不安全的URL重定向
 * 服务端请求伪造-SSRF
-* More。。。（详见writeup）
+* More.....（详见writeup）
 
 ## Todo
 
